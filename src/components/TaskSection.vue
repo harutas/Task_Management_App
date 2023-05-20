@@ -1,102 +1,71 @@
-<template>
-    <div class="mx-3">
-        <v-card width="250" class="pa-1">
-        <!-- セクション名 -->
-            <v-text-field
-                v-model="sectionName"
-                @input="$emit('input', $event, section.sectionId)"
-                label="Section"
-                hide-details="false"
-            ></v-text-field>
-            <task-card
-                v-on:delete-task="deleteTask"
-                v-on:change-task-title="changeTaskTitle"
-                v-on:change-task-content="changeTaskContent"
-                v-on:toggle-can-edit="toggleCanEdit"
-                v-on:toggle-is-done="toggleIsDone"
-                v-on:toggle-is-favorite="toggleIsFavorite"
-                :sectionName="sectionName"
-                :section="section"
-                v-for="task in section.taskArray"
-                :task="task"
-                :key="task.taskId">
-            </task-card>
-            <div class="d-flex justify-space-between px-3 py-2">
-                <v-icon
-                    @click="createTask"
-                    class="btn btn-outline-primary"
-                >
-                mdi-plus
-                </v-icon>
-                <v-icon
-                @click="$emit('delete-section', section.sectionId)"
-                class="btn btn-outline-primary"
-                >
-                mdi-delete
-                </v-icon>
-            </div>
-        </v-card>
-    </div>
-</template>
+<script setup lang="ts">
+import { toRefs } from 'vue';
+import { storeToRefs } from 'pinia';
+import { Section, Task } from '@/types';
+import { useTaskStore } from '@/stores/task';
+import { nanoid } from 'nanoid';
+import TaskCard from '@/components/TaskCard.vue';
 
-<script>
-import TaskCard from './TaskCard.vue'
-import {Task} from '/src/task.js'
-
-export default {
-    name: 'TaskSection',
-
-    components : {
-        TaskCard
-    },
-
-    props : {
-        section : Object
-    },
-
-    data(){
-        return {
-            taskId : 1,
-            sectionName : this.section.sectionName
-        }
-    },
-
-    methods : {
-        createTask(){
-            let newTask = new Task(this.section.sectionId, this.taskId, "", "", true, false, false);
-            this.taskId++;
-            this.$emit("create-task", this.section.sectionId, newTask);
-        },
-
-        deleteTask(sectionId, taskId){
-            return this.$emit("delete-task", sectionId, taskId);
-        },
-
-        changeTaskTitle($event, sectionId, taskId){
-            return this.$emit('change-task-title', $event, sectionId, taskId);
-        },
-
-        changeTaskContent($event, sectionId, taskId){
-            return this.$emit('change-task-content', $event, sectionId, taskId);
-        },
-
-        toggleCanEdit(canEdit, sectionId, taskId){
-            return this.$emit("toggle-can-edit", canEdit, sectionId, taskId);
-        },
-
-        toggleIsDone(isDone, sectionId, taskId){
-            return this.$emit("toggle-is-done", isDone, sectionId, taskId);
-        },
-
-        toggleIsFavorite(isFavorite, sectionId, taskId){
-            return this.$emit("toggle-is-favorite", isFavorite, sectionId, taskId);
-        },
-    },
-
-    computed : {
-        currSectionName(){
-            return this.sectionName;
-        }
-    }
+interface Props {
+  section: Section;
 }
+
+// const { getSectionTasks} = storeToRefs(useTaskStore());
+const {
+  addTask,
+  deleteSectionBySectionId,
+  deleteTaskBySectionId,
+  getSectionTasks,
+} = useTaskStore();
+
+const props = defineProps<Props>();
+const { section } = toRefs(props);
+
+const handleClickAddTaskButton = () => {
+  const { sectionId } = section.value;
+  const newTask: Task = {
+    id: nanoid(),
+    taskTitle: '',
+    taskContent: '',
+    isEdit: true,
+    isFavorite: false,
+    isDone: false,
+    sectionId: sectionId,
+  };
+  addTask(newTask);
+};
+
+const handleClickDeleteSection = () => {
+  const { sectionId } = section.value;
+  deleteSectionBySectionId(sectionId);
+  deleteTaskBySectionId(sectionId);
+};
 </script>
+
+<template>
+  <v-card width="250" class="pa-1 mx-3">
+    <!-- section name -->
+    <v-text-field
+      v-model="section.sectionName"
+      label="Section"
+      hide-details="auto"
+    />
+
+    <!-- task cards -->
+    <TaskCard
+      v-for="task in getSectionTasks(section.sectionId)"
+      :key="task.id"
+      :task="task"
+    />
+
+    <!-- add task button + delete section button -->
+    <div class="d-flex justify-space-between px-3 py-2">
+      <v-icon class="btn btn-outline-primary" @click="handleClickAddTaskButton">
+        mdi-plus
+      </v-icon>
+      <v-icon class="btn btn-outline-primary" @click="handleClickDeleteSection">
+        mdi-delete
+      </v-icon>
+    </div>
+  </v-card>
+</template>
