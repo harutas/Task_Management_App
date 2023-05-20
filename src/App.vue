@@ -1,5 +1,33 @@
+<script setup lang="ts">
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import TaskCard from '@/components/TaskCard.vue';
+import TaskSection from '@/components/TaskSection.vue';
+import AddSectionButton from '@/components/button/AddSectionButton.vue';
+import { useTaskStore } from '@/stores/task';
+
+const { sections } = storeToRefs(useTaskStore());
+</script>
+
 <template>
-  <h1>hello world</h1>
+  <v-app>
+    <div class="d-flex flex-nowrap overflow-auto pb-3">
+      <div class="d-flex flex-column">
+        <div class="mx-3">
+          <AddSectionButton />
+        </div>
+        <div class="d-flex align-start my-2">
+          <TaskSection
+            v-for="section in sections"
+            :key="section.sectionId"
+            :section="section"
+          />
+        </div>
+      </div>
+    </div>
+  </v-app>
+
+  <!-- <TaskCard /> -->
   <!-- <v-app>
     <div class="d-flex flex-nowrap overflow-auto pb-3">
       <div class="d-flex flex-column">
@@ -29,113 +57,3 @@
     </div>
   </v-app> -->
 </template>
-
-<script setup lang="ts">
-// import TaskSection from "./components/TaskSection.vue";
-// import { Section } from "/src/task.js";
-
-// export default {
-//   name: "App",
-
-//   components: {
-//     TaskSection,
-//   },
-
-//   data() {
-//     return {
-//       sectionId: 0,
-//       sections: [],
-//       sectionName: "",
-//     };
-//   },
-
-//   methods: {
-//     createSection() {
-//       let section = new Section(this.sectionId, this.sectionName);
-//       this.sectionId++;
-//       console.log(this.sections);
-//       return this.sections.push(section);
-//     },
-
-//     deleteSection(index) {
-//       this.$delete(this.sections, index);
-//     },
-
-//     changeSectionName($event, sectionId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       identifiedSection.sectionName = $event;
-//     },
-
-//     createTask(sectionId, taskObj) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       identifiedSection.taskArray.push(taskObj);
-//     },
-
-//     deleteTask(sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr.splice(i, 1);
-//         }
-//       }
-//     },
-
-//     changeTaskTitle($event, sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr[i].title = $event;
-//         }
-//       }
-//     },
-
-//     changeTaskContent($event, sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr[i].content = $event;
-//         }
-//       }
-//     },
-
-//     toggleCanEdit(canEdit, sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr[i].canEdit = !canEdit;
-//         }
-//       }
-//     },
-
-//     toggleIsDone(isDone, sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr[i].isDone = !isDone;
-//         }
-//       }
-//     },
-
-//     toggleIsFavorite(isFavorite, sectionId, taskId) {
-//       const identifiedSection = this.sections.find((section) => section.sectionId === sectionId);
-//       const taskArr = identifiedSection.taskArray;
-//       for (let i = 0; i < taskArr.length; i++) {
-//         if (taskArr[i].taskId === taskId) {
-//           taskArr[i].isFavorite = !isFavorite;
-//         }
-//       }
-//     },
-//   },
-
-//   computed: {
-//     sectionArray() {
-//       return this.sections;
-//     },
-//   },
-// };
-</script>
